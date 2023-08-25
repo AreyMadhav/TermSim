@@ -15,7 +15,8 @@ struct CommandDB {
         commands.insert("rm");
         commands.insert("cp");
         commands.insert("pwd");
-        commands.insert("sudo"); // Add the sudo command
+        commands.insert("sudo");
+        commands.insert("ifconfig");
         // Add more commands
     }
 
@@ -75,6 +76,8 @@ struct TerminalShell {
             simulateCp(tokens);
         } else if (command == "sudo") {
             simulateSudo(tokens);
+        } else if (command == "ifconfig") {
+            simulateIfconfig();
         } else if (!database.commandExists(command)) {
             std::cout << "bash:" << command << ": command not found..." << std::endl;
         }
@@ -131,6 +134,16 @@ struct TerminalShell {
             std::cout << "Simulating installation of package: " << package << std::endl;
             std::cout << "Package " << package << " has been installed." << std::endl;
         }
+    }
+    void simulateIfconfig() {
+        std::cout << "eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500" << std::endl;
+        std::cout << "        inet 192.168.1.2  netmask 255.255.255.0  broadcast 192.168.1.255" << std::endl;
+        std::cout << "        inet6 fe80::a00:27ff:fe45:fa07  prefixlen 64  scopeid 0x20<link>" << std::endl;
+        std::cout << "        ether 08:00:27:45:fa:07  txqueuelen 1000  (Ethernet)" << std::endl;
+        std::cout << "        RX packets 175  bytes 14093 (13.7 KiB)" << std::endl;
+        std::cout << "        RX errors 0  dropped 0  overruns 0  frame 0" << std::endl;
+        std::cout << "        TX packets 133  bytes 21119 (20.6 KiB)" << std::endl;
+        std::cout << "        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0" << std::endl;
     }
 };
 
