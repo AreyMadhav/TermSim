@@ -31,9 +31,11 @@ struct CommandDB {
 struct TerminalShell {
     std::string currentDirectory;
     std::string currentUser;
+    bool isRootMode;
+    std::string rootPassword;
     CommandDB database;
 
-    TerminalShell() : currentDirectory("/home/user"), currentUser("user") {}
+    TerminalShell() : currentDirectory("/home/user"), currentUser("user"), isRootMode(false), rootPassword("admin") {}
 
     void run() {
         while (true) {
@@ -47,12 +49,23 @@ struct TerminalShell {
             }
 
             if (userInput == "su root") {
+                std::cout<<"Enter root password: ";
+                std::string passwordInput;
+                std::cin >> passwordInput;
+
+                if (passwordInput == rootPassword) {
                 currentUser = "root";
+                isRootMode = true;
                 continue;
+            } else {
+            std::cout << "Incorrect password. Access Denied." << std::endl;
             }
 
+            continue;
+            }
             if (userInput == "logout") {
                 currentUser = "user";
+                isRootMode = false;
                 continue;
             }
 
@@ -215,7 +228,7 @@ struct TerminalShell {
     std::cout << "     `:+ssssssssssssssssss+:`           " << "CPU: Ryzen 9 5960x" << std::endl;
     std::cout << "         .-/+oossssoo+/-               " << "GPU: RTX 4090" << std::endl;
     std::cout << "                                        " << "Memory: 64 GB " << std::endl;
-    std::cout << "                                        " << "Disk: 256 GB" << std::endl;
+    std::cout << "                                        " << "Disk: 1 TB" << std::endl;
 }
 };
 
