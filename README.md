@@ -4,7 +4,7 @@ what can be done with the following code:
 
 1. Navigate Directories: You can use the cd command to change the current directory. The pwd command displays the current directory.
 
-2. List Files and Directories: The ls command simulates listing files and directories in the current directory.
+2. List Files and Directories: The ls command simulates listing files and directories in the current directory. (will make it dynamic soon)
 
 3. Create Directories: The mkdir command simulates creating new directories.
 
