@@ -180,10 +180,11 @@ struct TerminalShell {
 
     // Simulate nmap command (need a fix)
     void simulateNmap(const std::vector<std::string>& tokens) {
-        if (tokens.size() < 4 || tokens[1] != "-p-" || tokens[2] != "localhost") {
-            std::cout << "Usage(as of now): nmap -p- localhost" << std::endl;
+        if (tokens.size() < 4 || tokens[1] != "-p-" || tokens[2] != "localhostip") {
+            std::cout << "Usage(as of now): nmap -p- localhostip" << std::endl;
         }
         else {
+            std::string netstat = tokens[3];
             std::cout << "Starting Nmap 7.70 (https://nmap.org) at India Standard Time" << std::endl;
             std::cout << "Nmap scan report for localhost (127.0.0.1)" << std::endl;
             std::cout << "Host is up (0.075s latency)" << std::endl;
@@ -218,15 +219,15 @@ struct TerminalShell {
     std::cout << "   -+ssssssssssssssssssyyssss+-         " << "Kernel: Linux" << std::endl;
     std::cout << " .ossssssssssssssssssdMMMNysssso.       " << "Uptime: 1 hour" << std::endl;
     std::cout << "/ssssssssssshdmmNNmmyNMMMMhssssss/      " << "Packages: 1000" << std::endl;
-    std::cout << "+sssshhhyNMMMyhhyyyyhmNMMMNhssss+      " << "Shell: Shell" << std::endl;
-    std::cout << "ossyNMMMNyMMh     /mMMMNyNMMNoss      " << "Resolution: 1920x1080" << std::endl;
-    std::cout << "+sssshhhyNMMMyhhyyyyhdNMMMNhssss+      " << "DE: Gnome" << std::endl;
+    std::cout << "+sssshhhyNMMMyhhyyyyhmNMMMNhssss+       " << "Shell: Shell" << std::endl;
+    std::cout << "ossyNMMMNyMMh     /mMMMNyNMMNoss        " << "Resolution: 1920x1080" << std::endl;
+    std::cout << "+sssshhhyNMMMyhhyyyyhdNMMMNhssss+       " << "DE: Gnome" << std::endl;
     std::cout << "/sssssssssssdmmNNNNNNmmNMMMMhssss/      " << "WM: Gnome Manager" << std::endl;
-    std::cout << ".ossssssssssssssssssdMMMNysssso.       " << "Theme: Gnome Black Theme" << std::endl;
-    std::cout << " -+sssssssssssssssssyyyssss+-         " << "Icons: Gnome Black Icons" << std::endl;
+    std::cout << ".ossssssssssssssssssdMMMNysssso.        " << "Theme: Gnome Black Theme" << std::endl;
+    std::cout << " -+sssssssssssssssssyyyssss+-           " << "Icons: Gnome Black Icons" << std::endl;
     std::cout << "   -+ssssssssssssssssssyyssss+-         " << "Terminal: xterm" << std::endl;
     std::cout << "     `:+ssssssssssssssssss+:`           " << "CPU: Ryzen 9 5960x" << std::endl;
-    std::cout << "         .-/+oossssoo+/-               " << "GPU: RTX 4090" << std::endl;
+    std::cout << "         .-/+oossssoo+/-                " << "GPU: RTX 4090" << std::endl;
     std::cout << "                                        " << "Memory: 64 GB " << std::endl;
     std::cout << "                                        " << "Disk: 1 TB" << std::endl;
 }
