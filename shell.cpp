@@ -42,7 +42,7 @@ struct TerminalShell {
 
     void run() {
         while (true) {
-            std::cout << currentUser << "@" << currentDirectory << "$ ";
+            std::cout << "\033[1;32m" << currentUser << "\033[0m@\033[1;32m" << currentDirectory << "\033[0m$ ";
             std::string userInput;
             std::getline(std::cin, userInput);
 
