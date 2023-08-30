@@ -16,6 +16,6 @@ what can be done with the following code:
 
 7. Simulate sudo apt install {package}: You can simulate the installation of a package using a command like sudo apt install package-name.
 
-8. Simulate nmap (as of now can only simulate nmap -p- localhost)
+8. Simulate nmap (as of now can only simulate nmap -p- IP Address)
 
 9. Exit: Typing exit terminates the simulation and ends the program.
