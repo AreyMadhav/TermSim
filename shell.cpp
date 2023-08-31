@@ -20,6 +20,9 @@ struct CommandDB {
         commands.insert("ifconfig");
         commands.insert("neofetch");
         commands.insert("nmap");
+        //commands.insert("nginx");
+        //commands.insert("fail2ban");
+        //commands.insert("bettercap");
         // Add more commands
     }
 
@@ -41,40 +44,43 @@ struct TerminalShell {
     }
 
     void run() {
-        while (true) {
-            std::cout << "\033[1;32m" << currentUser << "\033[0m@\033[1;32m" << currentDirectory << "\033[0m$ ";
-            std::string userInput;
-            std::getline(std::cin, userInput);
+        std::string promptColor = "\033[1;32m"; // Default color: Bright green
 
-            if (userInput == "exit") {
-                std::cout << "Exiting terminal shell." << std::endl;
-                break;
+    while (true) {
+        // Displaying prompt with the selected color
+        std::cout << promptColor << currentUser << "\033[0m@\033[1;32m" << currentDirectory << "\033[0m$ ";
+
+        std::string userInput;
+        std::getline(std::cin, userInput);
+
+        if (userInput == "exit") {
+            std::cout << "Exiting terminal shell." << std::endl;
+            break;
+        } else if (userInput == "su root") {
+            std::cout << "Enter root password: ";
+            std::string passwordInput;
+            std::cin >> passwordInput;
+
+            if (passwordInput == rootPassword) {
+                currentUser = "root";
+                isRootMode = true;
+                promptColor = "\033[1;31m"; // Changing to red color
+            } else {
+                std::cout << "Incorrect password. Access Denied." << std::endl;
             }
 
-            if (userInput == "su root") {
-                std::cout << "Enter root password: ";
-                std::string passwordInput;
-                std::cin >> passwordInput;
-
-                if (passwordInput == rootPassword) {
-                    currentUser = "root";
-                    isRootMode = true;
-                    continue;
-                } else {
-                    std::cout << "Incorrect password. Access Denied." << std::endl;
-                }
-
-                continue;
-            }
-            if (userInput == "logout") {
-                currentUser = "user";
-                isRootMode = false;
-                continue;
-            }
-
-            executeCommand(userInput);
+            continue;
+        } else if (userInput == "logout") {
+            currentUser = "user";
+            isRootMode = false;
+            promptColor = "\033[1;32m"; // Changing back to green color
+            continue;
         }
+
+        executeCommand(userInput);
     }
+}
+
 
     void executeCommand(const std::string& userInput) {
         std::istringstream iss(userInput);
@@ -205,6 +211,7 @@ struct TerminalShell {
         std::cout << "RX errors 0  dropped 0  overruns 0  frame 0" << std::endl;
         std::cout << "TX packets 133  bytes 21119 (20.6 KiB)" << std::endl;
         std::cout << "TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0" << std::endl;
+
     }
 
     void simulateNeofetch() {
