@@ -78,8 +78,8 @@ struct TerminalShell {
         }
 
         executeCommand(userInput);
+        }
     }
-}
 
 
     void executeCommand(const std::string& userInput) {
@@ -105,7 +105,20 @@ struct TerminalShell {
         } else if (command == "cp") {
             simulateCp(tokens);
         } else if (command == "sudo") {
-            simulateSudo(tokens);
+            if (tokens.size() < 4) {
+                std::cout << "Usage: sudo <command> <options> <arguments>" << std::endl;
+            } else {
+                std::string subCommand = tokens[1];
+                if (subCommand == "apt" && tokens[2] == "install") {
+                    simulateAptInstall(tokens);
+                } else if (subCommand == "nano") {
+                    simulateTextEditor("nano", tokens);
+                } else if (subCommand == "vi") {
+                    simulateTextEditor("vi", tokens);
+                } else {
+                    std::cout << "Unsupported sudo command: " << subCommand << std::endl;
+                }
+            }
         } else if (command == "ifconfig") {
             simulateIfconfig();
         } else if (command == "neofetch") {
@@ -154,51 +167,76 @@ struct TerminalShell {
         }
     }
 
-    void simulateSudo(const std::vector<std::string>& tokens) {
-        if (tokens.size() < 4 || tokens[1] != "apt" || tokens[2] != "install") {
+    void simulateAptInstall(const std::vector<std::string>& tokens) {
+        if (tokens.size() < 5 || tokens[2] != "install") {
             std::cout << "Usage: sudo apt install {package}" << std::endl;
         } else {
             std::string package = tokens[3];
             std::cout << "Reading package lists... Done" << std::endl;
             std::cout << "Building dependency tree" << std::endl;
-            std::cout << "Reading state information... Done"<< std::endl;
+            std::cout << "Reading state information... Done" << std::endl;
             std::cout << "Package " << package << " has been installed." << std::endl;
         }
     }
 
-    void simulateNmap(const std::vector<std::string>& tokens) {
-    if (tokens.size() != 3 || tokens[1] != "-p-") {
-        std::cout << "Usage: nmap -p- IPAddress" << std::endl;
-    } else {
-        std::string netstat = tokens[2];
-
-        if (validIPs.find(netstat) != validIPs.end()) {
-            std::cout << "Starting Nmap 7.70 (https://nmap.org) at India Standard Time" << std::endl;
-            std::cout << "Nmap scan report for the given address" << std::endl;
-            std::cout << "Host is up (0.075s latency)" << std::endl;
-
-            if (netstat == "192.168.40.123") {
-                std::cout << "This is a special IP address." << std::endl;
-            } else if (netstat == "127.0.0.1") {
-                std::cout << "Loopback address detected." << std::endl;
-            } else {
-                std::cout << "Other addresses for the given address" << std::endl;
-                std::cout << "PORT      STATE  SERVICE" << std::endl;
-                std::cout << "22/tcp    open   ssh" << std::endl;
-                std::cout << "25/tcp    open   smtp" << std::endl;
-                std::cout << "53/tcp    open   domain" << std::endl;
-                std::cout << "80/tcp    open   http" << std::endl;
-                std::cout << "443/tcp   open   msrpc" << std::endl;
-                std::cout << "8080/tcp  open   http-proxy" << std::endl;
-                std::cout << "5432/tcp  open   postgresql" << std::endl;
-                std::cout << "61783/tcp open   unknown" << std::endl;
-                std::cout << "65001/tcp open   unknown" << std::endl;
-            }
+    void simulateTextEditor(const std::string& editor, const std::vector<std::string>& tokens) {
+        if (tokens.size() < 4) {
+            std::cout << "Usage: sudo " << editor << " <file>" << std::endl;
         } else {
-            std::cout << "IP Address not recognized in the network. Please check the network and try again..." << std::endl;
+            std::string filename = tokens[3];
+            std::cout << "Opening " << filename << " with " << editor << " text editor..." << std::endl;
+
+            std::string editorInput;
+            std::ostringstream fileContent;
+
+            std::cout << "Type your text below. Enter 'exit' on a new line to finish editing." << std::endl;
+
+            while (true) {
+                std::getline(std::cin, editorInput);
+                if (editorInput == "exit") {
+                    break;
+                }
+                fileContent << editorInput << std::endl;
+            }
+
+            std::cout << "Saving changes to " << filename << "..." << std::endl;
+            // You can save the 'fileContent' to the specified file here.
         }
     }
-}
+
+    void simulateNmap(const std::vector<std::string>& tokens) {
+        if (tokens.size() != 3 || tokens[1] != "-p-") {
+            std::cout << "Usage: nmap -p- IPAddress" << std::endl;
+        } else {
+            std::string netstat = tokens[2];
+
+            if (validIPs.find(netstat) != validIPs.end()) {
+                std::cout << "Starting Nmap 7.70 (https://nmap.org) at India Standard Time" << std::endl;
+                std::cout << "Nmap scan report for the given address" << std::endl;
+                std::cout << "Host is up (0.075s latency)" << std::endl;
+
+                if (netstat == "192.168.40.123") {
+                    std::cout << "This is a special IP address." << std::endl;
+                } else if (netstat == "127.0.0.1") {
+                    std::cout << "Loopback address detected." << std::endl;
+                } else {
+                    std::cout << "Other addresses for the given address" << std::endl;
+                    std::cout << "PORT      STATE  SERVICE" << std::endl;
+                    std::cout << "22/tcp    open   ssh" << std::endl;
+                    std::cout << "25/tcp    open   smtp" << std::endl;
+                    std::cout << "53/tcp    open   domain" << std::endl;
+                    std::cout << "80/tcp    open   http" << std::endl;
+                    std::cout << "443/tcp   open   msrpc" << std::endl;
+                    std::cout << "8080/tcp  open   http-proxy" << std::endl;
+                    std::cout << "5432/tcp  open   postgresql" << std::endl;
+                    std::cout << "61783/tcp open   unknown" << std::endl;
+                    std::cout << "65001/tcp open   unknown" << std::endl;
+                }
+            } else {
+                std::cout << "IP Address not recognized in the network. Please check the network and try again..." << std::endl;
+            }
+        }
+    }
 
 
 
@@ -233,7 +271,6 @@ struct TerminalShell {
     std::cout << "                                        " << "Disk: 1 TB" << std::endl;
     }
 };
-
 int main() {
     //Title of the terminal window
     SetConsoleTitle(TEXT("Terminal"));
