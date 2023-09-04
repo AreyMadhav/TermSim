@@ -14,7 +14,6 @@ public:
     FileSystemNode* parent;
     std::vector<FileSystemNode*> children;
 
-public:
     FileSystemNode(const std::string& _name, bool _isDirectory, FileSystemNode* _parent)
         : name(_name), isDirectory(_isDirectory), parent(_parent) {}
 
@@ -55,18 +54,6 @@ private:
     std::string rootPassword;
     CommandDB database;
     std::unordered_set<std::string> validIPs;
-
-    void simulateLs();
-    void simulateCd(const std::vector<std::string>& tokens);
-    void simulateMkdir(const std::vector<std::string>& tokens);
-    void simulateRm(const std::vector<std::string>& tokens);
-    void simulateCp(const std::vector<std::string>& tokens);
-    void simulateAptInstall(const std::vector<std::string>& tokens);
-    void simulateTextEditor(const std::string& editor, const std::vector<std::string>& tokens);
-    void simulateIfconfig();
-    void simulateNeofetch();
-    void simulateNmap(const std::vector<std::string>& tokens);
-
 public:
     std::string getName() const {
         return name;
@@ -147,43 +134,43 @@ public:
     }
 
     void handleSudoCommand(const std::vector<std::string>& tokens) {
-    if (tokens.size() < 2) {
-        std::cout << "Usage: sudo <command> <options> <arguments>" << std::endl;
-        return;
-    }
+        if (tokens.size() < 2) {
+            std::cout << "Usage: sudo <command> <options> <arguments>" << std::endl;
+            return;
+        }
 
-    std::string subCommand = tokens[1];
+        std::string subCommand = tokens[1];
 
-    if (subCommand == "apt") {
-        if (tokens.size() < 4 || tokens[2] != "install") {
-            std::cout << "Usage: sudo apt install <package>" << std::endl;
+        if (subCommand == "apt") {
+            if (tokens.size() < 4 || tokens[2] != "install") {
+                std::cout << "Usage: sudo apt install <package>" << std::endl;
+            } else {
+                std::string package = tokens[3];
+                std::cout << "Reading package lists... Done" << std::endl;
+                std::cout << "Building dependency tree" << std::endl;
+                std::cout << "Reading state information... Done" << std::endl;
+                std::cout << "Package " << package << " has been installed." << std::endl;
+            }
+        } else if (subCommand == "nano") {
+            if (tokens.size() < 3) {
+                std::cout << "Usage: sudo nano <file>" << std::endl;
+            } else {
+                std::string filename = tokens[2];
+                std::cout << "Opening " << filename << " with nano text editor..." << std::endl;
+                // Implement code to open the file with nano here
+            }
+        } else if (subCommand == "vi") {
+            if (tokens.size() < 3) {
+                std::cout << "Usage: sudo vi <file>" << std::endl;
+            } else {
+                std::string filename = tokens[2];
+                std::cout << "Opening " << filename << " with vi text editor..." << std::endl;
+                // Implement code to open the file with vi here
+            }
         } else {
-            std::string package = tokens[3];
-            std::cout << "Reading package lists... Done" << std::endl;
-            std::cout << "Building dependency tree" << std::endl;
-            std::cout << "Reading state information... Done" << std::endl;
-            std::cout << "Package " << package << " has been installed." << std::endl;
+            std::cout << "Unsupported sudo command: " << subCommand << std::endl;
         }
-    } else if (subCommand == "nano") {
-        if (tokens.size() < 3) {
-            std::cout << "Usage: sudo nano <file>" << std::endl;
-        } else {
-            std::string filename = tokens[2];
-            std::cout << "Opening " << filename << " with nano text editor..." << std::endl;
-            // Implement code to open the file with nano here
-        }
-    } else if (subCommand == "vi") {
-        if (tokens.size() < 3) {
-            std::cout << "Usage: sudo vi <file>" << std::endl;
-        } else {
-            std::string filename = tokens[2];
-            std::cout << "Opening " << filename << " with vi text editor..." << std::endl;
-            // Implement code to open the file with vi here
-        }
-    } else {
-        std::cout << "Unsupported sudo command: " << subCommand << std::endl;
     }
-}
 
     void executeCommand(const std::string& userInput) {
         std::istringstream iss(userInput);
@@ -232,11 +219,11 @@ public:
             std::cout << "bash:" << command << ": command not found..." << std::endl;
         }
     }
-};
-    void TerminalShell::simulateLs() {
-        std::cout << "Contents of directory '" << GetCurrentDirectory->name << "':" << std::endl;
-            for (auto child : GetCurrentDirectory->children) {
-                std::cout << child->name;
+
+    void simulateLs() {
+        std::cout << "Contents of directory '" << currentDirectory->name << "':" << std::endl;
+        for (auto child : currentDirectory->children) {
+            std::cout << child->name;
             if (child->isDirectory) {
                 std::cout << "/";
             }
@@ -245,49 +232,47 @@ public:
         std::cout << std::endl;
     }
 
-
-    void TerminalShell::simulateCd(const std::vector<std::string>& tokens) {
+    void simulateCd(const std::vector<std::string>& tokens) {
         if (tokens.size() < 2) {
             std::cout << "Usage: cd <directory>" << std::endl;
         } else {
             std::string newDirName = tokens[1];
             FileSystemNode* newDir = nullptr;
 
-        // Handle special case: ".." to move up one level
-        if (newDirName == "..") {
-            if (GetCurrentDirectory->parent) {
-                newDir = GetCurrentDirectory->parent;
+            // Handle special case: ".." to move up one level
+            if (newDirName == "..") {
+                if (currentDirectory->parent) {
+                    newDir = currentDirectory->parent;
+                } else {
+                    std::cout << "Already at the root directory." << std::endl;
+                }
             } else {
-                std::cout << "Already at the root directory." << std::endl;
-            }
-        } else {
-            // Search for the directory in the current directory's children
-            for (auto child : GetCurrentDirectory->children) {
-                if (child->name == newDirName && child->isDirectory) {
-                    newDir = child;
-                    break;
+                // Search for the directory in the current directory's children
+                for (auto child : currentDirectory->children) {
+                    if (child->name == newDirName && child->isDirectory) {
+                        newDir = child;
+                        break;
+                    }
                 }
             }
-        }
 
-        if (newDir) {
-            GetCurrentDirectory = newDir;
-            std::cout << "Changed directory to: " << GetCurrentDirectory->name << std::endl;
-        } else {
-            std::cout << "Directory not found: " << newDirName << std::endl;
+            if (newDir) {
+                currentDirectory = newDir;
+                std::cout << "Changed directory to: " << currentDirectory->name << std::endl;
+            } else {
+                std::cout << "Directory not found: " << newDirName << std::endl;
+            }
         }
     }
-}
 
-
-    void TerminalShell::simulateMkdir(const std::vector<std::string>& tokens) {
+    void simulateMkdir(const std::vector<std::string>& tokens) {
         if (tokens.size() < 2) {
             std::cout << "Usage: mkdir <directory>" << std::endl;
         } else {
             std::string newDirName = tokens[1];
             // Check if a directory with the same name already exists
             bool exists = false;
-            for (auto child : GetCurrentDirectory->children) {
+            for (auto child : currentDirectory->children) {
                 if (child->name == newDirName && child->isDirectory) {
                     exists = true;
                     break;
@@ -296,23 +281,23 @@ public:
             if (exists) {
                 std::cout << "Directory already exists: " << newDirName << std::endl;
             } else {
-                FileSystemNode* newDir = new FileSystemNode(newDirName, true, GetCurrentDirectory);
-                GetCurrentDirectory->children.push_back(newDir);
+                FileSystemNode* newDir = new FileSystemNode(newDirName, true, currentDirectory);
+                currentDirectory->children.push_back(newDir);
                 std::cout << "Created directory: " << newDirName << std::endl;
             }
         }
     }
 
-    void TerminalShell::simulateRm(const std::vector<std::string>& tokens) {
+    void simulateRm(const std::vector<std::string>& tokens) {
         if (tokens.size() < 2) {
             std::cout << "Usage: rm <file/directory>" << std::endl;
         } else {
             std::string targetName = tokens[1];
             // Search for the target in the current directory's children
-            for (auto it = GetCurrentDirectory->children.begin(); it != GetCurrentDirectory->children.end(); ++it) {
+            for (auto it = currentDirectory->children.begin(); it != currentDirectory->children.end(); ++it) {
                 if ((*it)->name == targetName) {
                     FileSystemNode* target = *it;
-                    GetCurrentDirectory->children.erase(it);
+                    currentDirectory->children.erase(it);
                     delete target;
                     std::cout << "Removed: " << targetName << std::endl;
                     return;
@@ -322,7 +307,7 @@ public:
         }
     }
 
-    void TerminalShell::simulateCp(const std::vector<std::string>& tokens) {
+    void simulateCp(const std::vector<std::string>& tokens) {
         if (tokens.size() < 3) {
             std::cout << "Usage: cp <source> <destination>" << std::endl;
         } else {
@@ -330,9 +315,9 @@ public:
         }
     }
 
-    void TerminalShell::simulateAptInstall(const std::vector<std::string>& tokens) {
+    void simulateAptInstall(const std::vector<std::string>& tokens) {
         if (tokens.size() < 5 || tokens[2] != "install") {
-            std::cout << "Usage: sudo apt install {package}" << std::endl;
+            std::cout << "Usage: sudo apt install <package>" << std::endl;
         } else {
             std::string package = tokens[3];
             std::cout << "Reading package lists... Done" << std::endl;
@@ -342,11 +327,11 @@ public:
         }
     }
 
-    void TerminalShell::simulateTextEditor(const std::string& editor, const std::vector<std::string>& tokens) {
-        if (tokens.size() < 4) {
+    void simulateTextEditor(const std::string& editor, const std::vector<std::string>& tokens) {
+        if (tokens.size() < 3) {
             std::cout << "Usage: sudo " << editor << " <file>" << std::endl;
         } else {
-            std::string filename = tokens[3];
+            std::string filename = tokens[2];
             std::cout << "Opening " << filename << " with " << editor << " text editor..." << std::endl;
 
             std::string editorInput;
@@ -367,7 +352,7 @@ public:
         }
     }
 
-    void TerminalShell::simulateNmap(const std::vector<std::string>& tokens) {
+    void simulateNmap(const std::vector<std::string>& tokens) {
         if (tokens.size() != 3 || tokens[1] != "-p-") {
             std::cout << "Usage: nmap -p- IPAddress" << std::endl;
         } else {
@@ -401,8 +386,7 @@ public:
         }
     }
 
-
-    void TerminalShell::simulateIfconfig() {
+    void simulateIfconfig() {
         std::cout << "eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500" << std::endl;
         std::cout << "inet 192.168.1.2  netmask 255.255.255.0  broadcast 192.168.1.255" << std::endl;
         std::cout << "inet6 fe80::a00:27ff:fe45:fa07  prefixlen 64  scopeid 0x20<link>" << std::endl;
@@ -411,29 +395,30 @@ public:
         std::cout << "RX errors 0  dropped 0  overruns 0  frame 0" << std::endl;
         std::cout << "TX packets 133  bytes 21119 (20.6 KiB)" << std::endl;
         std::cout << "TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0" << std::endl;
-
     }
 
-    void TerminalShell::simulateNeofetch() {
-    std::cout << "         .-/+oossssoo+/-.               " << "OS: Ubuntu" << std::endl;
-    std::cout << "     `:+ssssssssssssssssss+:`           " << "Host: user" << std::endl;
-    std::cout << "   -+ssssssssssssssssssyyssss+-         " << "Kernel: Linux" << std::endl;
-    std::cout << " .ossssssssssssssssssdMMMNysssso.       " << "Uptime: 1 hour" << std::endl;
-    std::cout << "/ssssssssssshdmmNNmmyNMMMMhssssss/      " << "Packages: 1000" << std::endl;
-    std::cout << "+sssshhhyNMMMyhhyyyyhmNMMMNhssss+       " << "Shell: Shell" << std::endl;
-    std::cout << "ossyNMMMNyMMh     /mMMMNyNMMNoss        " << "Resolution: 1920x1080" << std::endl;
-    std::cout << "+sssshhhyNMMMyhhyyyyhdNMMMNhssss+       " << "DE: Gnome" << std::endl;
-    std::cout << "/sssssssssssdmmNNNNNNmmNMMMMhssss/      " << "WM: Gnome Manager" << std::endl;
-    std::cout << ".ossssssssssssssssssdMMMNysssso.        " << "Theme: Gnome Black Theme" << std::endl;
-    std::cout << " -+sssssssssssssssssyyyssss+-           " << "Icons: Gnome Black Icons" << std::endl;
-    std::cout << "   -+ssssssssssssssssssyyssss+-         " << "Terminal: xterm" << std::endl;
-    std::cout << "     `:+ssssssssssssssssss+:`           " << "CPU: Ryzen 9 5960x" << std::endl;
-    std::cout << "         .-/+oossssoo+/-                " << "GPU: RTX 4090" << std::endl;
-    std::cout << "                                        " << "Memory: 64 GB " << std::endl;
-    std::cout << "                                        " << "Disk: 1 TB" << std::endl;
+    void simulateNeofetch() {
+        std::cout << "         .-/+oossssoo+/-.               " << "OS: Ubuntu" << std::endl;
+        std::cout << "     `:+ssssssssssssssssss+:`           " << "Host: user" << std::endl;
+        std::cout << "   -+ssssssssssssssssssyyssss+-         " << "Kernel: Linux" << std::endl;
+        std::cout << " .ossssssssssssssssssdMMMNysssso.       " << "Uptime: 1 hour" << std::endl;
+        std::cout << "/ssssssssssshdmmNNmmyNMMMMhssssss/      " << "Packages: 1000" << std::endl;
+        std::cout << "+sssshhhyNMMMyhhyyyyhmNMMMNhssss+       " << "Shell: Shell" << std::endl;
+        std::cout << "ossyNMMMNyMMh     /mMMMNyNMMNoss        " << "Resolution: 1920x1080" << std::endl;
+        std::cout << "+sssshhhyNMMMyhhyyyyhdNMMMNhssss+       " << "DE: Gnome" << std::endl;
+        std::cout << "/sssssssssssdmmNNNNNNmmNMMMMhssss/      " << "WM: Gnome Manager" << std::endl;
+        std::cout << ".ossssssssssssssssssdMMMNysssso.        " << "Theme: Gnome Black Theme" << std::endl;
+        std::cout << " -+sssssssssssssssssyyyssss+-           " << "Icons: Gnome Black Icons" << std::endl;
+        std::cout << "   -+ssssssssssssssssssyyssss+-         " << "Terminal: xterm" << std::endl;
+        std::cout << "     `:+ssssssssssssssssss+:`           " << "CPU: Ryzen 9 5960x" << std::endl;
+        std::cout << "         .-/+oossssoo+/-                " << "GPU: RTX 4090" << std::endl;
+        std::cout << "                                        " << "Memory: 64 GB " << std::endl;
+        std::cout << "                                        " << "Disk: 1 TB" << std::endl;
     }
+};
+
 int main() {
-    //Title of the terminal window
+    // Title of the terminal window
     SetConsoleTitle(TEXT("Terminal"));
 
     TerminalShell shell;
