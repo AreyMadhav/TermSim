@@ -1,4 +1,4 @@
-# terminalshellcpp
+# TermSim
 simulation of shell written in cpp
 what can be done with the following code:
 
